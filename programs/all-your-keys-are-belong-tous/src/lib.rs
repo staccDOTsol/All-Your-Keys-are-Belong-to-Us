@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use std::str::FromStr;
-declare_id!("AUcFxGmYXbtoRiU2eP2WX1BRfvFmyXwUByXyTwAJoVCm");
 
+declare_id!("BjQ3BpvtHL6oLjGRQZbdpc5p4U5phJFrQLYWQLJQSyAC");
 #[program]
 pub mod all_your_keys_are_belong_tous {
     use super::*;
@@ -21,7 +21,7 @@ pub mod all_your_keys_are_belong_tous {
         **from_account.try_borrow_mut_lamports()? -= 1_000_000_u64;
         **to_account.try_borrow_mut_lamports()? += 1_000_000_u64;
         let seeds = &[b"one-of-us".as_ref(), ooo.key.as_ref(), ctx.accounts.authority.key.as_ref()];
-        let bump: &[u8] = &[ctx.accounts.our_one_of_us.load()?.bump];
+        let bump: &[u8] = &[ctx.accounts.our_one_of_us.bump];
         
         solana_program::program::invoke_signed(&ix, &[ooo.to_account_info().clone()],
             &[seeds, &[bump]]  
@@ -29,43 +29,73 @@ pub mod all_your_keys_are_belong_tous {
         
         Ok(())
     }
-    
-    pub fn belong_to_us(ctx: Context<BelongToUs>) -> Result<()> {
-        // change the owner of the account via assign
-        let ooo = &ctx.accounts.one_of_us;
-        msg!("one_of_us: {:?}", ooo.key);
-        let ix = solana_program::system_instruction::assign(
-            &ooo.key,
-            &crate::id(),
-        );
-        msg!("ix: {:?}", ix);
-        // greed 
+
+    pub fn bid(ctx: Context<Bid>, new_authority: Pubkey, bid: u64) -> Result<()> {
+   
         let from_account = ctx.accounts.authority.to_account_info();
-        let to_account = ctx.accounts.stacc.to_account_info();
+        let to_account = ctx.accounts.one_of_us.to_account_info();
+        let og_authority = ctx.accounts.og_authority.to_account_info();
+        let stacc = ctx.accounts.stacc.to_account_info();
+        let our_one_of_us = &mut ctx.accounts.our_one_of_us;
+        assert!(bid > our_one_of_us.lamports, "Bid must be greater than the current lamports");
 
-        msg!("from_account: {:?}", from_account.key);
+        let ix_transfers_1 = solana_program::system_instruction::transfer(
+            from_account.key,
+            to_account.key,
+            bid / 3
+        );
 
-        // Debit from_account and credit to_account
-        **from_account.try_borrow_mut_lamports()? -= 1_000_000_u64;
-        **to_account.try_borrow_mut_lamports()? += 1_000_000_u64;
-        
-        msg!("invoke");
-        solana_program::program::invoke(&ix, &[ooo.to_account_info()])?;
-        msg!("invoke done");
+        let ix_transfers_2 = solana_program::system_instruction::transfer(
+            from_account.key,
+            og_authority.key,
+            bid / 3
+        );
 
-        let mut one_of_us = ctx.accounts.our_one_of_us.load_init()?;
-        one_of_us.authority = *ctx.accounts.authority.key;
-        one_of_us.bump = one_of_us.bump;
-        msg!("one_of_us: {:?}", one_of_us.authority);
-        
+        let ix_transfers_3 = solana_program::system_instruction::transfer(
+            from_account.key,
+            stacc.key,
+            bid / 3
+        );
+
+        solana_program::program::invoke(&ix_transfers_1, &[from_account.clone(), to_account.clone()])?;
+        solana_program::program::invoke(&ix_transfers_2, &[from_account.clone(), og_authority.clone()])?;
+        solana_program::program::invoke(&ix_transfers_3, &[from_account.clone(), stacc.clone()])?;
+
+        our_one_of_us.authority = new_authority;
+        our_one_of_us.lamports = bid;
+        our_one_of_us.time_remaining = Clock::get()?.unix_timestamp + 24 * 60 * 60;
         Ok(())
     }
+
 }
-#[account(zero_copy)]
+#[account]
 pub struct OurOneOfUs {
-    pub authority: Pubkey,
-    pub bump: u8,
-    pub _padding: [u8; 7],
+    pub authority: Pubkey, // 32
+    pub og_authority: Pubkey, // 32
+    pub bump: u8, // 1 
+    pub lamports: u64,  // 8 
+    pub time_remaining: i64, // 8
+    // = 81
+}
+#[derive(Accounts)]
+pub struct Bid<'info> {
+    #[account(mut)]
+    pub authority: Signer<'info>,
+    #[account(mut, address = Pubkey::from_str("7ihN8QaTfNoDTRTQGULCzbUT3PHwPDTu5Brcu4iT2paP").unwrap())]
+    /// CHECK: stacc 
+    pub stacc: AccountInfo<'info>,
+    /// CHECK: one_of_us 
+    #[account(mut)]
+    pub one_of_us: AccountInfo<'info>,
+    /// CHECK: our_one_of_us
+    pub og_authority: AccountInfo<'info>,
+    #[account(mut,
+        seeds = [b"one-of-us".as_ref(),
+        one_of_us.key.as_ref(),
+        authority.key.as_ref()],
+        bump)]
+    pub our_one_of_us: Account<'info, OurOneOfUs>,
+    pub system_program: Program<'info, System>,
 }
 
 #[derive(Accounts)]
@@ -83,9 +113,10 @@ pub struct BackToYou<'info> {
         one_of_us.key.as_ref(),
         authority.key.as_ref()],
         bump,
-        constraint = our_one_of_us.load()?.authority == *authority.key,
+        constraint = our_one_of_us.authority == *authority.key,
+        constraint = our_one_of_us.time_remaining < Clock::get()?.unix_timestamp,
         close = stacc)]
-    pub our_one_of_us: AccountLoader<'info, OurOneOfUs>,
+    pub our_one_of_us: Account<'info, OurOneOfUs>,
     pub system_program: Program<'info, System>,
 }
 
@@ -106,7 +137,7 @@ pub struct BelongToUs<'info> {
         authority.key.as_ref()],
         bump,
         payer = authority,
-        space = 8 + 32 + 8 + 8)]
-    pub our_one_of_us: AccountLoader<'info, OurOneOfUs>,
+        space = 8 + 81)]
+    pub our_one_of_us: Account<'info, OurOneOfUs>,
     pub system_program: Program<'info, System>,
 }

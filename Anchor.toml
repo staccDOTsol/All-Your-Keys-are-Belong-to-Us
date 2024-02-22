@@ -5,7 +5,7 @@ seeds = false
 skip-lint = false
 
 [programs.localnet]
-all_your_keys_are_belong_tous = "AUcFxGmYXbtoRiU2eP2WX1BRfvFmyXwUByXyTwAJoVCm"
+all_your_keys_are_belong_tous = "BjQ3BpvtHL6oLjGRQZbdpc5p4U5phJFrQLYWQLJQSyAC"
 
 [registry]
 url = "https://api.apr.dev"

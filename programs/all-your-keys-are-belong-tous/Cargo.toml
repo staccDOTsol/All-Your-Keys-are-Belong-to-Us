@@ -17,5 +17,6 @@ default = []
 
 [dependencies]
 anchor-lang = { version = "0.29.0", features = ["init-if-needed"] }
+bincode = "1.3.3"
 bytemuck = "1.14.3"
-solana-program = "1.18.2"
+solana-program = "*"
