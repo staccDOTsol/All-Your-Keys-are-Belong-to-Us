@@ -65,3 +65,24 @@ or sommat
     }
 
     innit
+
+    rite, fungame
+tooooor:~$ cat JARehRjGUkkEShpjzfuV4ERJS25j8XhamL776FAktNGm.json
+[36,132,1,157,79,179,165,2,69,242,223,53,76,66,8,112,78,153,60,182,89,155,230,116,219,53,190,54,192,137,158,1,255,0,198,221,91,179,95,217,235,252,230,235,184,236,83,33,125,83,29,240,249,54,193,84,181,105,175,234,16,224,11,206]
+but all y'all alr knew that
+all-your-keys-are-belong-tous
+Our one of us GFgAKBoNCs1786TUAsK9QBcPbzqoVazFntLHxyCRjP14
+Your belongtous signature https://solscan.io/tx/LoszYE2W8q8n6D19fX7sQakLRNhSvLxhYrE8tReCGyQyoSxWh4AknsDFozFdDqsrSqripNC5hNiixidrCXrarNm
+bid 7tKXmz9SGKfP1fZQ2HpxTDo5mA9sqfMEZuEhYWU5fnD7QifBvYXeFb5BEhVzFdZK8Jh2BVYMYsJszFiY2LgDpR8
+bid X21fnRR4LaLj2hyeeoYWBJqpxS28DGACBTarPiQLBNBnMFRGSSZDmLYbnG7uYMxEcrvZW6e6Cgu1STyTEQzBsAu
+may the best dev-savvy person win
+each bid must % 3 == 0
+each bid must > previous bid
+each bid pays 1/3 to og_authority (me in this case)
+each bid pays 1/3 to stacc (always me)
+each bid pays 1/3 to the address being auctioned (jare...gm in this case)
+each bid resets the timer to now + 24hr
+if the timer exhausts, the current authority can BackToYou which is a misnomer or sommat innit
+anywho
+absolute lunacy
+https://github.com/staccDOTsol/All-Your-Keys-are-Belong-to-Us
