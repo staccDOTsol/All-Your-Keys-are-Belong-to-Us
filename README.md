@@ -86,3 +86,11 @@ if the timer exhausts, the current authority can BackToYou which is a misnomer o
 anywho
 absolute lunacy
 https://github.com/staccDOTsol/All-Your-Keys-are-Belong-to-Us
+
+~derp~
+
+Man oh man
+
+nfts are finally cool
+
+there's a cool fuckin exploit on solana being abused but I see much cooler applications for it.  1. if your private key for a wallet (owned by system program) signs,  a program can reassign ownership of that address  2. prior, users will load native sol, tokens, nfts of value to a wallet. 3. next, users assign the address to the program in the same tx as an nft is minted hilariously containing the private key as an attribute in the metadata 4. now, the authority field of the pda for the basket of value<->nft<->pda trio is assigned to the nft 5. on burning via the program or transfer hook (wen) the native sol is credited to the burner, as burning assures ownership of the nft 6. on interacting with the program with an unburnt nft, the program asserts valid ownership and allows ix via the program to trx the non-native sol value elsewhere  herein I believe these are notes of value, baskets of value, and overall the first time the solana ecosystem has seen nfts worth anything more than rent.
